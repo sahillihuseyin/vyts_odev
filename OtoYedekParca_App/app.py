@@ -24,16 +24,17 @@ init_database()
 
 
 def get_connection():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=10)  # 10sn bekle, locked hatası azalır
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
+    conn.execute("PRAGMA journal_mode = WAL")   # Eş zamanlı okuma/yazma desteği
+    conn.execute("PRAGMA busy_timeout = 10000") # 10sn busy timeout
     return conn
 
 
 def check_db_connection():
     try:
         conn = get_connection()
-        conn.execute("SELECT sqlite_version()")
         version = conn.execute("SELECT sqlite_version()").fetchone()[0]
         conn.close()
         return True, f"SQLite {version} — Bağlantı başarılı"
@@ -43,22 +44,29 @@ def check_db_connection():
 
 def query_db(sql, params=None, fetchall=True):
     conn = get_connection()
-    cursor = conn.execute(sql, params or [])
-    columns = [col[0] for col in cursor.description]
-    if fetchall:
-        rows = [dict(zip(columns, row)) for row in cursor.fetchall()]
-    else:
-        row = cursor.fetchone()
-        rows = dict(zip(columns, row)) if row else None
-    conn.close()
-    return rows
+    try:
+        cursor = conn.execute(sql, params or [])
+        columns = [col[0] for col in cursor.description]
+        if fetchall:
+            rows = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        else:
+            row = cursor.fetchone()
+            rows = dict(zip(columns, row)) if row else None
+        return rows
+    finally:
+        conn.close()  # Hata olsa da bağlantıyı kapat
 
 
 def execute_db(sql, params=None):
     conn = get_connection()
-    conn.execute(sql, params or [])
-    conn.commit()
-    conn.close()
+    try:
+        conn.execute(sql, params or [])
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()  # Hata olsa da bağlantıyı kapat
 
 
 # ===========================================================================
