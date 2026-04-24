@@ -1,8 +1,4 @@
-[build]
-builder = "NIXPACKS"
-
 [deploy]
-startCommand = "cd OtoYedekParca_App && gunicorn app:app --bind 0.0.0.0:$PORT"
 healthcheckPath = "/"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
