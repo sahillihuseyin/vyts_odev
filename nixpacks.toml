@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["python311"]
+
+[phases.install]
+cmds = ["pip install -r OtoYedekParca_App/requirements.txt"]
+
+[start]
+cmd = "cd OtoYedekParca_App && gunicorn app:app --bind 0.0.0.0:$PORT"
