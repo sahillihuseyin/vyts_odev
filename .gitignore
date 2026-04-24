@@ -1,0 +1,5 @@
+OtoYedekParca_App/*.db
+OtoYedekParca_App/__pycache__/
+OtoYedekParca_App/*.pyc
+*.log
+.env
