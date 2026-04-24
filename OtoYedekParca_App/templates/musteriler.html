@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Müşteriler{% endblock %}
+{% block page_title %}👥 Müşteri Yönetimi{% endblock %}
+
+{% block content %}
+<!-- Ekleme Formu -->
+<div class="card">
+    <div class="card-header">➕ Yeni Müşteri Ekle</div>
+    <form action="/musteri/ekle" method="POST" class="form-grid">
+        <div class="form-group">
+            <label>Ad Soyad *</label>
+            <input type="text" name="adsoyad" required placeholder="Ahmet Yılmaz">
+        </div>
+        <div class="form-group">
+            <label>E-posta *</label>
+            <input type="email" name="email" required placeholder="ornek@gmail.com">
+        </div>
+        <div class="form-group">
+            <label>Telefon * (11 hane)</label>
+            <input type="text" name="telefon" required placeholder="05XXXXXXXXX" maxlength="11" pattern="0[0-9]{10}">
+        </div>
+        <div class="form-group">
+            <label>Adres</label>
+            <input type="text" name="adres" placeholder="İlçe / Şehir">
+        </div>
+        <div class="form-group form-full">
+            <button type="submit" class="btn btn-primary">➕ Müşteri Ekle</button>
+        </div>
+    </form>
+</div>
+
+<!-- Güncelleme Formu -->
+<div class="card">
+    <div class="card-header">✏️ Müşteri Güncelle</div>
+    <form action="/musteri/guncelle" method="POST" class="form-grid">
+        <div class="form-group">
+            <label>Müşteri ID *</label>
+            <input type="number" name="musteri_id" required placeholder="1" min="1">
+        </div>
+        <div class="form-group">
+            <label>Yeni Ad Soyad *</label>
+            <input type="text" name="adsoyad" required placeholder="Ad Soyad">
+        </div>
+        <div class="form-group">
+            <label>Yeni E-posta *</label>
+            <input type="email" name="email" required placeholder="yeni@gmail.com">
+        </div>
+        <div class="form-group">
+            <label>Yeni Telefon *</label>
+            <input type="text" name="telefon" required placeholder="05XXXXXXXXX" maxlength="11">
+        </div>
+        <div class="form-group">
+            <label>Yeni Adres</label>
+            <input type="text" name="adres" placeholder="İlçe / Şehir">
+        </div>
+        <div class="form-group form-full">
+            <button type="submit" class="btn btn-warning">✏️ Güncelle</button>
+        </div>
+    </form>
+</div>
+
+<!-- Müşteri Listesi -->
+<div class="card">
+    <div class="card-header">📋 Kayıtlı Müşteriler ({{ kayitlar|length }} kişi)</div>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th><th>Ad Soyad</th><th>E-posta</th>
+                    <th>Telefon</th><th>Adres</th><th>Kayıt Tarihi</th><th>İşlem</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for k in kayitlar %}
+                <tr>
+                    <td><span class="badge">{{ k.MusteriID }}</span></td>
+                    <td><strong>{{ k.AdSoyad }}</strong></td>
+                    <td>{{ k.Email }}</td>
+                    <td>{{ k.Telefon }}</td>
+                    <td>{{ k.Adres or '—' }}</td>
+                    <td>{{ k.KayitTarihi.strftime('%d.%m.%Y') if k.KayitTarihi else '—' }}</td>
+                    <td>
+                        <a href="/musteri/sil/{{ k.MusteriID }}"
+                           onclick="return confirm('{{ k.AdSoyad }} silinsin mi?')"
+                           class="btn btn-danger btn-sm">🗑️ Sil</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="no-data">Kayıt bulunamadı.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

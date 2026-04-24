@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Ürünler{% endblock %}
+{% block page_title %}🔧 Ürün / Parça Yönetimi{% endblock %}
+
+{% block content %}
+<!-- Ekleme Formu -->
+<div class="card">
+    <div class="card-header">➕ Yeni Ürün Ekle</div>
+    <form action="/urun/ekle" method="POST" class="form-grid">
+        <div class="form-group">
+            <label>Kategori *</label>
+            <select name="kategori_id" required>
+                <option value="">— Seçin —</option>
+                {% for k in kategoriler %}
+                <option value="{{ k.KategoriID }}">{{ k.KategoriAdi }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Tedarikçi *</label>
+            <select name="tedarikci_id" required>
+                <option value="">— Seçin —</option>
+                {% for t in tedarikciler %}
+                <option value="{{ t.TedarikciID }}">{{ t.FirmaAdi }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Ürün Adı *</label>
+            <input type="text" name="urun_adi" required placeholder="Ön Fren Balatası">
+        </div>
+        <div class="form-group">
+            <label>Ürün Kodu *</label>
+            <input type="text" name="urun_kodu" required placeholder="FRN-004">
+        </div>
+        <div class="form-group">
+            <label>OEM Kodu</label>
+            <input type="text" name="oem_kodu" placeholder="Orijinal Parça No (Örn: 5K0698151A)">
+        </div>
+        <div class="form-group">
+            <label>Araç Modeli</label>
+            <input type="text" name="arac_modeli" placeholder="Volkswagen Golf / Genel">
+        </div>
+        <div class="form-group">
+            <label>Stok Miktarı *</label>
+            <input type="number" name="stok_miktari" required min="0" value="0">
+        </div>
+        <div class="form-group">
+            <label>Alış Fiyatı (₺) *</label>
+            <input type="number" name="alis_fiyati" required step="0.01" min="0.01" placeholder="150.00">
+        </div>
+        <div class="form-group">
+            <label>Satış Fiyatı (₺) *</label>
+            <input type="number" name="satis_fiyati" required step="0.01" min="0.01" placeholder="250.00">
+        </div>
+        <div class="form-group form-full">
+            <button type="submit" class="btn btn-primary">➕ Ürün Ekle</button>
+        </div>
+    </form>
+</div>
+
+<!-- Ürün Listesi -->
+<div class="card">
+    <div class="card-header">📋 Stok Listesi ({{ kayitlar|length }} ürün)</div>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Kod</th><th>OEM Kodu</th><th>Ürün Adı</th><th>Kategori</th>
+                    <th>Araç Modeli</th><th>Stok</th><th>Durum</th>
+                    <th>Alış ₺</th><th>Satış ₺</th><th>Kâr ₺</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for k in kayitlar %}
+                <tr>
+                    <td><code>{{ k['UrunKodu'] if 'UrunKodu' in k else k.UrunKodu }}</code></td>
+                    <td><code style="color: #64748b;">{{ (k['OemKodu'] if 'OemKodu' in k else k.OemKodu) or '—' }}</code></td>
+                    <td><strong>{{ k['UrunAdi'] if 'UrunAdi' in k else k.UrunAdi }}</strong></td>
+                    <td>{{ k.KategoriAdi }}</td>
+                    <td>{{ k.AracModeli or '—' }}</td>
+                    <td>{{ k.StokMiktari }}</td>
+                    <td>
+                        <span class="status-badge status-{{ 'danger' if k.StokDurumu in ['Tükendi','Kritik'] else ('warning' if k.StokDurumu=='Düşük' else 'success') }}">
+                            {{ k.StokDurumu }}
+                        </span>
+                    </td>
+                    <td>{{ "%.2f"|format(k.AlisFiyati) }} ₺</td>
+                    <td>{{ "%.2f"|format(k.SatisFiyati) }} ₺</td>
+                    <td>{{ "%.2f"|format(k.KarMarji) }} ₺</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="9" class="no-data">Kayıt bulunamadı.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

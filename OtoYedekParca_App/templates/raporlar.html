@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}Raporlar{% endblock %}
+{% block page_title %}📊 Raporlar — Sayfa Açıldığında Otomatik Yüklenir{% endblock %}
+
+{% block content %}
+<div class="reports-note">
+    ⚡ Aşağıdaki raporlar <strong>VIEW</strong> ve <strong>Stored Procedure</strong> üzerinden otomatik çekiliyor.
+</div>
+
+<!-- RAPOR 1: En Çok Satan Ürünler (SP) -->
+<div class="card">
+    <div class="card-header">
+        🏆 Rapor 1: En Çok Satan 5 Ürün
+        <span class="source-tag">📌 sp_EnCokSatanUrunler</span>
+    </div>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th><th>Ürün Kodu</th><th>Ürün Adı</th><th>Kategori</th>
+                    <th>Satış Adedi</th><th>Toplam Ciro (₺)</th><th>Sipariş Sayısı</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i, k in enumerate(r1) %}
+                <tr>
+                    <td>
+                        <span class="rank rank-{{ i+1 }}">
+                            {% if i == 0 %}🥇{% elif i == 1 %}🥈{% elif i == 2 %}🥉{% else %}{{ i+1 }}{% endif %}
+                        </span>
+                    </td>
+                    <td><code>{{ k['UrunKodu'] }}</code></td>
+                    <td><strong>{{ k['UrunAdi'] }}</strong></td>
+                    <td>{{ k['Kategori'] }}</td>
+                    <td class="text-center"><strong>{{ k['Toplam Satış Adedi'] }}</strong></td>
+                    <td class="text-right text-success"><strong>{{ "%.2f"|format(k['Toplam Ciro (₺)']) }} ₺</strong></td>
+                    <td class="text-center">{{ k['Sipariş Sayısı'] }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="no-data">Veri bulunamadı.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- RAPOR 2: Aylık Ciro Özeti (VIEW) -->
+<div class="card">
+    <div class="card-header">
+        📅 Rapor 2: Aylık Sipariş & Ciro Özeti
+        <span class="source-tag">📌 vw_AylikCiroOzeti</span>
+    </div>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Yıl</th><th>Ay</th><th>Sipariş Sayısı</th>
+                    <th>Toplam Ciro (₺)</th><th>Ort. Sipariş (₺)</th><th>Aktif Müşteri</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for k in r2 %}
+                <tr>
+                    <td>{{ k['Yil'] if 'Yil' in k else k.Yil }}</td>
+                    <td><strong>{{ k['AyAdi'] if 'AyAdi' in k else k.AyAdi }}</strong></td>
+                    <td class="text-center">{{ k['SiparisSayisi'] if 'SiparisSayisi' in k else k.SiparisSayisi }}</td>
+                    <td class="text-right text-success"><strong>{{ "%.2f"|format(k['ToplamCiro'] if 'ToplamCiro' in k else k.ToplamCiro) }} ₺</strong></td>
+                    <td class="text-right">{{ "%.2f"|format(k['OrtSiparisTutari'] if 'OrtSiparisTutari' in k else k.OrtSiparisTutari) }} ₺</td>
+                    <td class="text-center">{{ k['AktifMusteriSayisi'] if 'AktifMusteriSayisi' in k else k.AktifMusteriSayisi }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="no-data">Veri bulunamadı.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- RAPOR 3: Kritik Stok Uyarıları (VIEW) -->
+<div class="card">
+    <div class="card-header">
+        ⚠️ Rapor 3: Kritik Stok Uyarıları
+        <span class="source-tag">📌 vw_StokDurumu</span>
+    </div>
+    {% if r3 %}
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Kod</th><th>Ürün Adı</th><th>Kategori</th>
+                    <th>Tedarikçi</th><th>Stok</th><th>Durum</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for k in r3 %}
+                <tr class="row-warning">
+                    <td><code>{{ k['UrunKodu'] if 'UrunKodu' in k else k.UrunKodu }}</code></td>
+                    <td><strong>{{ k['UrunAdi'] if 'UrunAdi' in k else k.UrunAdi }}</strong></td>
+                    <td>{{ k['KategoriAdi'] if 'KategoriAdi' in k else k.KategoriAdi }}</td>
+                    <td>{{ k['TedarikciAdi'] if 'TedarikciAdi' in k else k.TedarikciAdi }}</td>
+                    <td class="text-center">
+                        {% set stok = k['StokMiktari'] if 'StokMiktari' in k else k.StokMiktari %}
+                        <strong class="{{ 'text-danger' if stok == 0 else 'text-warning' }}">
+                            {{ stok }}
+                        </strong>
+                    </td>
+                    <td>
+                        {% set durum = k['StokDurumu'] if 'StokDurumu' in k else k.StokDurumu %}
+                        <span class="status-badge status-{{ 'danger' if durum == 'Tükendi' else 'warning' }}">
+                            {{ durum }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="no-data-msg">✅ Kritik stok uyarısı bulunmuyor.</p>
+    {% endif %}
+</div>
+
+<!-- RAPOR 4: Son Siparişler (VIEW) -->
+<div class="card">
+    <div class="card-header">
+        🕐 Rapor 4: Son Siparişler
+        <span class="source-tag">📌 vw_SonSiparisler</span>
+    </div>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Sipariş No</th><th>Müşteri</th>
+                    <th>Sipariş Tarihi</th><th>Durum</th><th>Toplam ₺</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for k in r4 %}
+                <tr>
+                    <td><span class="badge">#{{ k['SiparisID'] if 'SiparisID' in k else k.SiparisID }}</span></td>
+                    <td>{{ k['MusteriAdi'] if 'MusteriAdi' in k else k.MusteriAdi }}</td>
+                    {% set tarih = k['SiparisTarihi'] if 'SiparisTarihi' in k else k.SiparisTarihi %}
+                    <td>{{ tarih.strftime('%d.%m.%Y') if tarih else '—' }}</td>
+                    <td>
+                        {% set durum = k['Durum'] if 'Durum' in k else k.Durum %}
+                        {% set dc = {'Beklemede':'warning','Hazırlanıyor':'info','Kargoda':'info','Teslim Edildi':'success','İptal':'danger'} %}
+                        <span class="status-badge status-{{ dc.get(durum,'default') }}">{{ durum }}</span>
+                    </td>
+                    {% set tutar = k['ToplamTutar'] if 'ToplamTutar' in k else k.ToplamTutar %}
+                    <td class="text-right"><strong>{{ "%.2f"|format(tutar) }} ₺</strong></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="no-data">Veri bulunamadı.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Jinja2 enumerate filtresi (base'de tanımlı değilse)
+// Raporlar sayfası zaten otomatik yüklenir — JS animasyonu
+document.querySelectorAll('.card').forEach((card, i) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+        card.style.transition = 'all 0.4s ease';
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, i * 150);
+});
+</script>
+{% endblock %}

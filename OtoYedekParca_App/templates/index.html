@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Ana Sayfa{% endblock %}
+{% block page_title %}Ana Sayfa{% endblock %}
+
+{% block content %}
+<!-- Bağlantı Durumu Kartı -->
+<div class="conn-hero {% if connected %}conn-hero-ok{% else %}conn-hero-err{% endif %}">
+    <div class="conn-hero-icon">{{ '🟢' if connected else '🔴' }}</div>
+    <div>
+        <div class="conn-hero-title">Veritabanı Bağlantısı: {{ 'AKTİF' if connected else 'BAĞLANTI YOK' }}</div>
+        <div class="conn-hero-sub">{{ db_info[:70] if connected else db_info }}</div>
+    </div>
+</div>
+
+<!-- İstatistik Kartları -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-val">{{ stats.get('musteri', '-') }}</div>
+        <div class="stat-lbl">Müşteri</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">🔧</div>
+        <div class="stat-val">{{ stats.get('urun', '-') }}</div>
+        <div class="stat-lbl">Ürün / Parça</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-val">{{ stats.get('siparis', '-') }}</div>
+        <div class="stat-lbl">Toplam Sipariş</div>
+    </div>
+    <div class="stat-card stat-warning">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-val">{{ stats.get('bekleyen', '-') }}</div>
+        <div class="stat-lbl">Bekleyen Sipariş</div>
+    </div>
+    <div class="stat-card stat-danger">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-val">{{ stats.get('kritik_stok', '-') }}</div>
+        <div class="stat-lbl">Kritik Stok</div>
+    </div>
+</div>
+
+<!-- Hızlı Erişim -->
+<div class="quick-links">
+    <h3 class="section-title">Hızlı Erişim</h3>
+    <div class="quick-grid">
+        <a href="{{ url_for('musteriler') }}" class="quick-card">
+            <span>👥</span><br>Müşteri Yönetimi
+        </a>
+        <a href="{{ url_for('urunler') }}" class="quick-card">
+            <span>🔧</span><br>Ürün Yönetimi
+        </a>
+        <a href="{{ url_for('siparisler') }}" class="quick-card">
+            <span>📦</span><br>Siparişler
+        </a>
+        <a href="{{ url_for('raporlar') }}" class="quick-card">
+            <span>📊</span><br>Raporlar
+        </a>
+    </div>
+</div>
+{% endblock %}
