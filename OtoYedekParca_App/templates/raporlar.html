@@ -140,7 +140,7 @@
                     <td><span class="badge">#{{ k['SiparisID'] if 'SiparisID' in k else k.SiparisID }}</span></td>
                     <td>{{ k['MusteriAdi'] if 'MusteriAdi' in k else k.MusteriAdi }}</td>
                     {% set tarih = k['SiparisTarihi'] if 'SiparisTarihi' in k else k.SiparisTarihi %}
-                    <td>{{ tarih.strftime('%d.%m.%Y') if tarih else '—' }}</td>
+                    <td>{{ tarih[:10] if tarih else '—' }}</td>
                     <td>
                         {% set durum = k['Durum'] if 'Durum' in k else k.Durum %}
                         {% set dc = {'Beklemede':'warning','Hazırlanıyor':'info','Kargoda':'info','Teslim Edildi':'success','İptal':'danger'} %}

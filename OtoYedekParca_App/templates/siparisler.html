@@ -44,7 +44,7 @@
                     <td><span class="badge">#{{ k['SiparisID'] if 'SiparisID' in k else k.SiparisID }}</span></td>
                     <td><strong style="color: #60a5fa; cursor: pointer;">{{ k['MusteriAdi'] if 'MusteriAdi' in k else k.MusteriAdi }} 🔍</strong></td>
                     {% set tarih = k['SiparisTarihi'] if 'SiparisTarihi' in k else k.SiparisTarihi %}
-                    <td>{{ tarih.strftime('%d.%m.%Y %H:%M') if tarih else '—' }}</td>
+                    <td>{{ tarih[:16].replace('T',' ') if tarih else '—' }}</td>
                     <td>
                         {% set durum_class = {
                             'Beklemede':    'warning',

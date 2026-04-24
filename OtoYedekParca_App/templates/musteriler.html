@@ -78,7 +78,7 @@
                     <td>{{ k.Email }}</td>
                     <td>{{ k.Telefon }}</td>
                     <td>{{ k.Adres or '—' }}</td>
-                    <td>{{ k.KayitTarihi.strftime('%d.%m.%Y') if k.KayitTarihi else '—' }}</td>
+                    <td>{{ k.KayitTarihi[:10] if k.KayitTarihi else '—' }}</td>
                     <td>
                         <a href="/musteri/sil/{{ k.MusteriID }}"
                            onclick="return confirm('{{ k.AdSoyad }} silinsin mi?')"
